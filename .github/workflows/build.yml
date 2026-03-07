@@ -5,30 +5,17 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: zmkfirmware/zmk-build-arm:stable  # ZMK専用のビルド環境を丸ごと使う
     steps:
       - name: Checkout
-        uses: actions/checkout@v4  # v3からv4へ
-
-      - name: Cache west modules
-        uses: actions/cache@v4     # v3からv4へ
-        env:
-          cache-name: cache-zephyr-modules
-        with:
-          path: |
-            modules
-            tools
-            zephyr
-            bootloader
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('config/west.yml') }}
+        uses: actions/checkout@v4
 
       - name: West Init
         run: west init -l config
 
       - name: West Update
         run: west update
-
-      - name: West Zephyr export
-        run: west zephyr-export
 
       - name: Build Totem Left
         run: west build -s zmk/app -b seeeduino_xiao_ble -- -DSHIELD=totem_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
@@ -37,8 +24,7 @@ jobs:
         run: west build -s zmk/app -b seeeduino_xiao_ble -- -DSHIELD=totem_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
 
       - name: Archive artifacts
-        uses: actions/upload-artifact@v4  # ここがエラーの原因でした。v4へ修正。
+        uses: actions/upload-artifact@v4
         with:
           name: totem-firmware
-          path: |
-            build/zephyr/zmk.uf2
+          path: build/zephyr/zmk.uf2
