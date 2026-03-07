@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: West Init
-        run: west init -l config
+        run: west init -l .
 
       - name: West Update
         run: west update
