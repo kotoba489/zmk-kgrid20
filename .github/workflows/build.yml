@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: zmkfirmware/zmk-build-arm:stable  # ZMK専用のビルド環境を丸ごと使う
+      image: zmkfirmware/zmk-build-arm:stable
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,6 +16,9 @@ jobs:
 
       - name: West Update
         run: west update
+
+      - name: West Zephyr export
+        run: west zephyr-export
 
       - name: Build Totem Left
         run: west build -s zmk/app -b seeeduino_xiao_ble -- -DSHIELD=totem_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
