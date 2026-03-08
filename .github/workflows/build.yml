@@ -14,33 +14,25 @@ jobs:
         run: |
           west init -l .
           west update
-          echo "ZEPHYR_BASE=$(pwd)/zephyr" >> $GITHUB_ENV
+          # Zephyrの場所を絶対パスで環境変数に叩き込みます
+          echo "ZEPHYR_BASE=$GITHUB_WORKSPACE/zephyr" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/zephyr" >> $GITHUB_ENV
 
-      - name: Debug and Build (FORCE)
+      - name: Build Firmware (FINAL)
         run: |
-          # 1. 執念で ZMK のアプリ本体（CMakeLists.txt）を探し出す
-          # config フォルダの中身を除外して、真の ZMK ソースを探します
-          REAL_APP_PATH=$(find /__w -name "CMakeLists.txt" | grep "zmk/app/CMakeLists.txt" | sed 's/\/CMakeLists.txt//' | head -n 1)
+          # 前回特定した正しいパスを使用
+          APP_PATH="$GITHUB_WORKSPACE/zmk/app"
           
-          # もし見つからなければ、名前だけで探す
-          if [ -z "$REAL_APP_PATH" ]; then
-            REAL_APP_PATH=$(find /__w -type d -name "app" | grep "zmk/app" | head -n 1)
-          fi
-
-          echo "Found REAL_APP_PATH at: $REAL_APP_PATH"
-
-          if [ -z "$REAL_APP_PATH" ]; then
-            echo "ERROR: ZMK app directory is still hidden. Listing all directories for final diagnosis:"
-            find /__w -maxdepth 4 -type d
-            exit 1
-          fi
-
-          # 2. 特定したパスを使ってビルドを実行
-          west build -s "$REAL_APP_PATH" -b seeeduino_xiao_ble -- -DSHIELD=totem_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+          # Zephyr環境をエクスポート（今回はワークスペース内で実行）
+          west zephyr-export
+          
+          # 左手ビルド
+          west build -s "$APP_PATH" -b seeeduino_xiao_ble -- -DSHIELD=totem_left -DZMK_CONFIG="$GITHUB_WORKSPACE/config"
           cp build/zephyr/zmk.uf2 ./totem_left.uf2
-
+          
+          # 右手ビルド
           rm -rf build
-          west build -s "$REAL_APP_PATH" -b seeeduino_xiao_ble -- -DSHIELD=totem_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+          west build -s "$APP_PATH" -b seeeduino_xiao_ble -- -DSHIELD=totem_right -DZMK_CONFIG="$GITHUB_WORKSPACE/config"
           cp build/zephyr/zmk.uf2 ./totem_right.uf2
 
       - name: Archive artifacts
