@@ -7,11 +7,11 @@ jobs:
       build_matrix_path: ".github/workflows/build.yml"
       config_path: "config"
 
-# ここから下が「これを作って！」という具体的な指示です
+# --- ここから下が「何をビルドするか」の具体的な指示です ---
       build_matrix: |
         {
           "include": [
             { "board": "seeeduino_xiao_ble", "shield": "k_grid_left" },
             { "board": "seeeduino_xiao_ble", "shield": "k_grid_right" }
           ]
-        }n
+        }
