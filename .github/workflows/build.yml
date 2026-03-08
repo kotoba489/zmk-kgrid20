@@ -1,37 +1,5 @@
-name: Build ZMK Firmware
-on: [push, pull_request, workflow_dispatch]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: zmkfirmware/zmk-build-arm:stable
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Initialize and Update (Force)
-        run: |
-          # 1. ワークスペースの初期化（ルートに west.yml がある前提）
-          west init -l .
-          # 2. 依存関係のダウンロード（ここで数分かかります）
-          west update
-          # 3. 環境変数の強制設定（zephyr-exportの代わり）
-          echo "ZEPHYR_BASE=$(pwd)/zephyr" >> $GITHUB_ENV
-
-      - name: Build Firmware
-        run: |
-          # 4. 左手版のビルド（パスを zmk/app に固定）
-          west build -s zmk/app -b seeeduino_xiao_ble -- -DSHIELD=totem_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-          cp build/zephyr/zmk.uf2 totem_left.uf2
-          
-          # 5. 右手版のビルド
-          rm -rf build
-          west build -s zmk/app -b seeeduino_xiao_ble -- -DSHIELD=totem_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-          cp build/zephyr/zmk.uf2 totem_right.uf2
-
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: totem_firmware
-          path: ./*.uf2
+west build -b seeeduino_xiao_ble -- -DSHIELD=totem_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+      cp build/zephyr/zmk.uf2 totem_left.uf2
+      rm -rf build
+      west build -b seeeduino_xiao_ble -- -DSHIELD=totem_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+      cp build/zephyr/zmk.uf2 totem_right.uf2
