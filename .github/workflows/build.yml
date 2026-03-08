@@ -1,4 +1,21 @@
-- name: Build Firmware (with Settings Reset)
+name: Build ZMK Firmware
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: zmkfirmware/zmk-build-arm:stable
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize and Update
+        run: |
+          west init -l .
+          west update
+
+      - name: Build Firmware (with Settings Reset)
         run: |
           # 1. 動作確認済みのパスを利用
           APP_PATH="/__w/zmk-config-kotoba489/zmk/app"
@@ -23,7 +40,7 @@
             -DZephyr-sdk_DIR=/opt/zephyr-sdk/cmake
           cp build/zephyr/zmk.uf2 ./totem_right.uf2
 
-          # 4. Settings Reset ビルド (今回追加)
+          # 4. Settings Reset ビルド
           rm -rf build
           west build -s "$APP_PATH" -b xiao_ble -- \
             -DSHIELD=settings_reset \
