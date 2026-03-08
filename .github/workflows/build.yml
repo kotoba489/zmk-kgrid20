@@ -4,5 +4,5 @@ jobs:
   build:
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
     with:
-      machine: seeeduino_xiao_ble
-      shield: k_grid_left k_grid_right
+      board: seeeduino_xiao_ble
+      shield_list: "k_grid_left k_grid_right"
