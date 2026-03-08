@@ -4,48 +4,38 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: zmkfirmware/zmk-build-arm:stable
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Initialize and Update
+      - name: Install West
+        run: pip3 install west
+
+      - name: Initialize Workspace
         run: |
           west init -l .
           west update
-          # Docker内の標準的なSDKパスを強制設定します
-          echo "ZEPHYR_SDK_INSTALL_DIR=/opt/zephyr-sdk" >> $GITHUB_ENV
-          echo "ZEPHYR_TOOLCHAIN_VARIANT=zephyr" >> $GITHUB_ENV
 
-      - name: Build Firmware (Final Fix)
-        run: |
-          # 1. 環境のエクスポート
-          west zephyr-export
-          
-          # 2. 前回のログで確定したパス
-          APP_PATH="/__w/zmk-config-kotoba489/zmk/app"
-          
-          # 3. 左手ビルド
-          # ツールチェーンの場所を cmake に直接教えてコンパイラエラーを物理的に消します
-          west build -s "$APP_PATH" -b xiao_ble -- \
-            -DSHIELD=totem_left \
-            -DZMK_CONFIG="$GITHUB_WORKSPACE/config" \
-            -DZEPHYR_SDK_INSTALL_DIR=/opt/zephyr-sdk
+      - name: ZMK Build Action (Left)
+        # ZMK公式のビルド用アクションを直接使います。これが最も確実です。
+        uses: zmkfirmware/zmk-build-action@v2
+        with:
+          repository_path: zmk/app
+          board: xiao_ble
+          shield: totem_left
+          config_path: config
 
-          cp build/zephyr/zmk.uf2 ./totem_left.uf2
-          
-          # 4. 右手ビルド
-          rm -rf build
-          west build -s "$APP_PATH" -b xiao_ble -- \
-            -DSHIELD=totem_right \
-            -DZMK_CONFIG="$GITHUB_WORKSPACE/config" \
-            -DZEPHYR_SDK_INSTALL_DIR=/opt/zephyr-sdk
-
-          cp build/zephyr/zmk.uf2 ./totem_right.uf2
+      - name: ZMK Build Action (Right)
+        uses: zmkfirmware/zmk-build-action@v2
+        with:
+          repository_path: zmk/app
+          board: xiao_ble
+          shield: totem_right
+          config_path: config
 
       - name: Archive artifacts
         uses: actions/upload-artifact@v4
         with:
           name: totem_firmware
-          path: ./*.uf2
+          path: |
+            *.uf2
