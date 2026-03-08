@@ -11,28 +11,42 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Initialize workspace (west init)
+        # 確実にカレントディレクトリをワークスペースにします
         run: west init -l .
 
       - name: Update modules (west update)
+        # ここでZMK本体が 'zmk' フォルダにダウンロードされます
         run: west update
 
       - name: Export Zephyr env
         run: west zephyr-export
 
-      - name: Debug - List all files (これでパスを特定します)
-        # ファイル構造を最大2階層まで表示します
-        run: find . -maxdepth 3 -not -path '*/.*'
-
       - name: Build Firmware
         run: |
-          # フォルダを探して、appという名前が含まれる場所でビルドを実行
-          APP_PATH=$(find . -type d -name "app" | head -n 1)
-          echo "Found APP_PATH at: $APP_PATH"
-          
-          if [ -z "$APP_PATH" ]; then
-            echo "Error: app directory not found!"
-            exit 1
+          # ZMKの構造上、本体は通常 'zmk/app' に展開されます。
+          # もしそこになければ、直接 'app' を探します。
+          if [ -d "zmk/app" ]; then
+            TARGET_PATH="zmk/app"
+          elif [ -d "app" ]; then
+            TARGET_PATH="app"
+          else
+            # 最終手段：システム全体からappフォルダを探し出す
+            TARGET_PATH=$(find . -name "app" -type d -print -quit)
           fi
           
-          west build -s "$APP_PATH" -b seeeduino_xiao_ble -- -DSHIELD=totem_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+          echo "Determined TARGET_PATH: $TARGET_PATH"
+          
+          # 左手のビルド
+          west build -s "$TARGET_PATH" -b seeeduino_xiao_ble -- -DSHIELD=totem_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
           cp build/zephyr/zmk.uf2 totem_left.uf2
+          
+          # 右手のビルド（buildフォルダを一旦消す）
+          rm -rf build
+          west build -s "$TARGET_PATH" -b seeeduino_xiao_ble -- -DSHIELD=totem_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+          cp build/zephyr/zmk.uf2 totem_right.uf2
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: totem_firmware
+          path: ./*.uf2
