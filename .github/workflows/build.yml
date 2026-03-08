@@ -12,7 +12,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: West Init
-        run: west init -l config
+        # config フォルダ内ではなく、ルートにある west.yml を参照するように修正
+        run: west init -l .
 
       - name: West Update
         run: west update
