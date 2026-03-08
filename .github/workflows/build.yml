@@ -1,10 +1,5 @@
 name: Build ZMK Firmware
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
@@ -15,19 +10,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache west modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            modules/
-            tools/
-            zephyr/
-            bootloader/
-            zmk
-          key: ${{ runner.os }}-build-${{ hashFiles('**/west.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-build-
-
       - name: Initialize workspace (west init)
         run: west init -l .
 
@@ -37,24 +19,20 @@ jobs:
       - name: Export Zephyr env
         run: west zephyr-export
 
-      - name: Build Firmware (Auto-detect path)
+      - name: Debug - List all files (これでパスを特定します)
+        # ファイル構造を最大2階層まで表示します
+        run: find . -maxdepth 3 -not -path '*/.*'
+
+      - name: Build Firmware
         run: |
-          # appディレクトリの場所を自動判別してビルド
-          if [ -d "zmk/app" ]; then APP_PATH="zmk/app"; else APP_PATH="app"; fi
+          # フォルダを探して、appという名前が含まれる場所でビルドを実行
+          APP_PATH=$(find . -type d -name "app" | head -n 1)
+          echo "Found APP_PATH at: $APP_PATH"
           
-          echo "Using APP_PATH: $APP_PATH"
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: app directory not found!"
+            exit 1
+          fi
           
-          # 左手版のビルド
           west build -s "$APP_PATH" -b seeeduino_xiao_ble -- -DSHIELD=totem_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
           cp build/zephyr/zmk.uf2 totem_left.uf2
-          
-          # ビルドディレクトリをクリアして右手版
-          rm -rf build
-          west build -s "$APP_PATH" -b seeeduino_xiao_ble -- -DSHIELD=totem_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-          cp build/zephyr/zmk.uf2 totem_right.uf2
-
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: totem_firmware
-          path: ./*.uf2
