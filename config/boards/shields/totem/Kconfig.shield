@@ -1,9 +1,5 @@
-config SHIELD_TOTEM_LEFT
+config SHIELD_MY_GRID_LEFT
     def_bool $(shields_list_contains,totem_left)
 
-config SHIELD_TOTEM_RIGHT
+config SHIELD_MY_GRID_RIGHT
     def_bool $(shields_list_contains,totem_right)
-
-# ここに「格子状」であることを暗示するダミーの定義を入れます
-config SHIELD_TOTEM_GRID
-    def_bool y
