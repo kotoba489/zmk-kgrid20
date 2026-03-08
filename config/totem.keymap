@@ -3,24 +3,18 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/outputs.h>
 
-/* エディターに物理配置を教えるための魔法の1行 */
-/ {
-    chosen {
-        zmk,physical-layout = &physical_layout0;
-    };
-};
-
 / {
     keymap {
         compatible = "zmk,keymap";
 
         default_layer {
             display-name = "Base";
+            /* 10列 × 4行 ＝ 合計40キーを定義します */
             bindings = <
                 &kp Q    &kp W    &kp E    &kp R    &kp T      &kp Y    &kp U    &kp I    &kp O    &kp P
                 &kp A    &kp S    &kp D    &kp F    &kp G      &kp H    &kp J    &kp K    &kp L    &kp SEMI
                 &kp Z    &kp X    &kp C    &kp V    &kp B      &kp N    &kp M    &kp COMMA &kp DOT &kp SLASH
-                                  &kp LCTRL &kp LALT &kp SPACE &kp ENTER &kp RALT &kp RCTRL
+                &kp ESC  &kp LALT &kp LGUI &kp LSHFT &kp SPACE &kp ENTER &kp RSHFT &kp RGUI &kp BACKSPACE &kp RCTRL
             >;
         };
     };
