@@ -11,8 +11,7 @@ jobs:
   build:
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
     with:
-      # build_matrix ではなく matrix を使用
-      matrix: |
+      build_matrix: |
         [
           { "board": "seeeduino_xiao_ble", "shield": "k_grid_left" },
           { "board": "seeeduino_xiao_ble", "shield": "k_grid_right" }
