@@ -11,8 +11,8 @@ jobs:
   build:
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
     with:
-      # build_matrix ではなく、個別に shield を指定する形式に修正
-      machine: seeeduino_xiao_ble
-      shield: |
-        - k_grid_left
-        - k_grid_right
+      build_matrix: |
+        [
+          { "board": "seeeduino_xiao_ble", "shield": "k_grid_left" },
+          { "board": "seeeduino_xiao_ble", "shield": "k_grid_right" }
+        ]
