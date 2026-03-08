@@ -4,38 +4,43 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: zmkfirmware/zmk-build-arm:stable
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install West
-        run: pip3 install west
-
-      - name: Initialize Workspace
+      - name: Initialize and Update
         run: |
           west init -l .
           west update
+          # SDKの場所をDocker内の正しいパス (/opt/zephyr-sdk) に完全に固定
+          echo "ZEPHYR_SDK_INSTALL_DIR=/opt/zephyr-sdk" >> $GITHUB_ENV
 
-      - name: ZMK Build Action (Left)
-        # ZMK公式のビルド用アクションを直接使います。これが最も確実です。
-        uses: zmkfirmware/zmk-build-action@v2
-        with:
-          repository_path: zmk/app
-          board: xiao_ble
-          shield: totem_left
-          config_path: config
+      - name: Build Firmware (Final)
+        run: |
+          # 1. 以前成功したパスを再利用
+          APP_PATH="/__w/zmk-config-kotoba489/zmk/app"
+          
+          # 2. 左手ビルド (SDKのパスをcmakeに直接渡す)
+          west build -s "$APP_PATH" -b xiao_ble -- \
+            -DSHIELD=totem_left \
+            -DZMK_CONFIG="$GITHUB_WORKSPACE/config" \
+            -DZephyr-sdk_DIR=/opt/zephyr-sdk/cmake
 
-      - name: ZMK Build Action (Right)
-        uses: zmkfirmware/zmk-build-action@v2
-        with:
-          repository_path: zmk/app
-          board: xiao_ble
-          shield: totem_right
-          config_path: config
+          cp build/zephyr/zmk.uf2 ./totem_left.uf2
+          
+          # 3. 右手ビルド
+          rm -rf build
+          west build -s "$APP_PATH" -b xiao_ble -- \
+            -DSHIELD=totem_right \
+            -DZMK_CONFIG="$GITHUB_WORKSPACE/config" \
+            -DZephyr-sdk_DIR=/opt/zephyr-sdk/cmake
+
+          cp build/zephyr/zmk.uf2 ./totem_right.uf2
 
       - name: Archive artifacts
         uses: actions/upload-artifact@v4
         with:
           name: totem_firmware
-          path: |
-            *.uf2
+          path: ./*.uf2
