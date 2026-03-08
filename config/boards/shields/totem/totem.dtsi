@@ -23,13 +23,13 @@
         wakeup-source;
         diode-direction = "col2row";
         
-        /* Seeeduino XIAO BLE の物理ピン D0-D3 を Row に割り当て */
+        /* XIAO BLE の物理ピン D0-D3 を使用 */
         row-gpios = <&xiao_d 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
                     <&xiao_d 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
                     <&xiao_d 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
                     <&xiao_d 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
 
-        /* Seeeduino XIAO BLE の物理ピン D4-D10 を Column に割り当て */
+        /* XIAO BLE の物理ピン D4-D10 を使用 */
         col-gpios = <&xiao_d 4 GPIO_ACTIVE_HIGH>,
                     <&xiao_d 5 GPIO_ACTIVE_HIGH>,
                     <&xiao_d 6 GPIO_ACTIVE_HIGH>,
