@@ -1,10 +1,9 @@
 ![9781](https://github.com/user-attachments/assets/8426b6aa-ca83-4a60-8c90-19ad8286074b)
 
 
-
-
-<img width="822" height="379" alt="スクリーンショット 2026-03-10 16 40 48" src="https://github.com/user-attachments/assets/2cb116be-fa15-45e2-89f8-d56abd7396a7" />
 ## 大西配列をアレンジしたキーマッピングを活用
+<img width="822" height="379" alt="スクリーンショット 2026-03-10 16 40 48" src="https://github.com/user-attachments/assets/2cb116be-fa15-45e2-89f8-d56abd7396a7" />
+
 
 
 
