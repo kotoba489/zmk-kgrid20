@@ -3,7 +3,6 @@
 
 ## 大西配列をアレンジしたキーマッピングを活用
 
-<img width="822" height="379" alt="スクリーンショット 2026-03-10 16 40 48" src="https://github.com/user-attachments/assets/c858983f-129a-4eb0-a08c-a10710aed398" />
 
 
 
