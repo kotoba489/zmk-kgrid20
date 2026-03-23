@@ -48,6 +48,13 @@ jobs:
           west build -s zmk/app -b xiao_ble -- -DSHIELD=k_grid_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
           cp build/zephyr/zmk.uf2 k_grid_right.uf2
 
+      # 3. Settings Reset のビルド (追加)
+      - name: West Build (Settings Reset)
+        run: |
+          rm -rf build
+          west build -s zmk/app -b xiao_ble -- -DSHIELD=settings_reset -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+          cp build/zephyr/zmk.uf2 settings_reset.uf2
+
       # 成果物のアップロード
       - name: Archive artifacts
         uses: actions/upload-artifact@v4
@@ -56,3 +63,4 @@ jobs:
           path: |
             k_grid_left.uf2
             k_grid_right.uf2
+            settings_reset.uf2
