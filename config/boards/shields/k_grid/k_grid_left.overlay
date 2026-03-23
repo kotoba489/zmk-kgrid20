@@ -1,2 +1,5 @@
-#include "kgrid20.dtsi"
-/* 左側はオフセットなし */
+#include "k_grid.dtsi"
+
+&default_transform {
+    col-offset = <0>;
+};
