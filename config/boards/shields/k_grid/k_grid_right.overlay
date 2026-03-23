@@ -4,6 +4,21 @@
     col-offset = <5>;
 };
 
+/ {
+    /* 右手側に物理エンコーダーがない場合でも、
+       ノード定義を空で持っておくか、あるいは左手と対称に定義します */
+    right_encoder: encoder {
+        compatible = "alps,ec11";
+        label = "RIGHT_ENCODER";
+        /* 右手にもエンコーダーを付ける場合はピン番号を指定。
+           付けない場合は、一旦 D6/D7 などダミーで書いておくか、
+           keymap側で left_encoder のみ指定しているならこのブロックは削除可です */
+        a-gpios = <&xiao_d 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        b-gpios = <&xiao_d 7 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        steps = <80>;
+    };
+};
+
 &kscan0 {
     col-gpios
         = <&xiao_d 8 GPIO_ACTIVE_HIGH>
