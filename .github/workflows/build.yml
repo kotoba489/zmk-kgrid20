@@ -1,4 +1,4 @@
-name: Build kg10key
+name: Build kgrid20
 
 on: [push, pull_request, workflow_dispatch]
 
@@ -10,6 +10,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Cache west modules
         uses: actions/cache@v4
         env:
@@ -26,6 +27,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+
       - name: West Init
         run: west init -l config
       - name: West Update
@@ -33,27 +35,32 @@ jobs:
       - name: West Zephyr export
         run: west zephyr-export
 
-      # 1. kg10keyのビルド
-      - name: West Build (kg10key)
+      # 1. kgrid20 Left のビルド
+      - name: West Build (kgrid20 Left)
+        run: |
+          west build -s zmk/app -b xiao_ble -- -DSHIELD=kgrid20_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+          cp build/zephyr/zmk.uf2 kgrid20_left.uf2
+
+      # 2. kgrid20 Right のビルド
+      - name: West Build (kgrid20 Right)
         run: |
           rm -rf build
-          west build -s zmk/app -b xiao_ble -- -DSHIELD=kg10key -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-      - name: Rename kg10key UF2
-        run: cp build/zephyr/zmk.uf2 kg10key.uf2
+          west build -s zmk/app -b xiao_ble -- -DSHIELD=kgrid20_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+          cp build/zephyr/zmk.uf2 kgrid20_right.uf2
 
-      # 2. Settings Resetのビルド
+      # 3. Settings Resetのビルド (任意)
       - name: West Build (Settings Reset)
         run: |
           rm -rf build
           west build -s zmk/app -b xiao_ble -- -DSHIELD=settings_reset -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-      - name: Rename Reset UF2
-        run: cp build/zephyr/zmk.uf2 settings_reset.uf2
+          cp build/zephyr/zmk.uf2 settings_reset.uf2
 
       # 成果物のアップロード
       - name: Archive artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kg10key_firmware
+          name: kgrid20_firmware
           path: |
-            kg10key.uf2
+            kgrid20_left.uf2
+            kgrid20_right.uf2
             settings_reset.uf2
