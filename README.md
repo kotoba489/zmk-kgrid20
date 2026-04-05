@@ -54,6 +54,12 @@ ZMKのポインティング機能を有効化しています。
 
 ```conf
 CONFIG_ZMK_POINTING=y
+```
+
+詳細なキー割り当ては `kgrid20.keymap` を参照してください。
+
+---
+
 ## 5. メンテナンス・トラブルシューティング
 
 ### ✅ 通常のキーマップ変更
@@ -68,7 +74,6 @@ CONFIG_ZMK_POINTING=y
 
 ---
 
-　
 ## MIT License
 
 This project is licensed under the MIT License.
