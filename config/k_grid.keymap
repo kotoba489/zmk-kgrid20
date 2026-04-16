@@ -20,7 +20,7 @@
         layer_1 {
             display-name = "Edit";
             bindings = <
-&kp LA(LG(NUMBER_4))  &none  &kp LBKT      &kp RBKT      &kp ESC    &kp TAB    &kp N7   &kp N8         &kp N9        &kp N0
+&kp LG(LS(NUMBER_4))  &none  &kp LBKT      &kp RBKT      &kp ESC    &kp TAB    &kp N7   &kp N8         &kp N9        &kp N0
 &none                 &none  &kp LPAR      &kp RPAR      &kp AT     &kp EQUAL  &kp N4   &kp N5         &kp N6        &none
 &none                 &none  &none         &kp PERCENT   &kp DOT    &kp MINUS  &kp N1   &kp N2         &kp NUMBER_3  &none
 &none                 &none  &kp LEFT_ALT  &kp LEFT_GUI  &kp SPACE  &kp SPACE  &kp RET  &kp BACKSPACE  &kp RCTRL     &none
